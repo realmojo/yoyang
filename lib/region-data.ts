@@ -123,7 +123,10 @@ export interface RegionStats {
   region_slug: string;
   sido: string;
   sigungu: string;
+  /** 기관 수 (code 기준 중복 제거) */
   facility_count: number;
+  /** 평가 건수 (급여종류·회차별 행 수) */
+  eval_count: number;
   grade_a: number;
   grade_b: number;
   grade_c: number;
@@ -151,7 +154,10 @@ export interface RegionStats {
 /** 전국 집계 한 줄 */
 export interface NationalStats {
   region_count: number;
+  /** 기관 수 (code 기준 중복 제거) */
   facility_count: number;
+  /** 평가 건수 */
+  eval_count: number;
   grade_a: number;
   grade_b: number;
   grade_c: number;
@@ -194,6 +200,15 @@ const FACILITY_COLUMNS = [
  * 적재(npm run import:eval) 직후에는 이 시간만큼 예전 값이 보일 수 있다.
  */
 const CACHE_SECONDS = 3600;
+
+/**
+ * 캐시 키에 함께 넣는 버전.
+ *
+ * 조회 결과의 모양(컬럼 구성)이 바뀌면 반드시 올린다. 올리지 않으면 예전 모양
+ * 그대로 저장돼 있던 값이 계속 나오고, 새로 추가한 필드를 읽는 화면이
+ * `undefined` 로 터진다. 실제로 eval_count 를 더했을 때 이 사고가 났다.
+ */
+const CACHE_VERSION = "v2";
 
 /** 시군구 하나의 집계. 아직 적재 전이면 null. */
 async function fetchRegionStats(
@@ -303,24 +318,24 @@ async function fetchFacilities(
 
 /* unstable_cache 는 인자를 캐시 키에 함께 넣는다. 지역별로 따로 저장된다. */
 
-const cachedRegionStats = unstable_cache(fetchRegionStats, ["yoyang", "region-stats"], {
+const cachedRegionStats = unstable_cache(fetchRegionStats, [CACHE_VERSION, "region-stats"], {
   revalidate: CACHE_SECONDS,
   tags: ["yoyang-eval"],
 });
 
 const cachedAllRegionStats = unstable_cache(
   fetchAllRegionStats,
-  ["yoyang", "all-region-stats"],
+  [CACHE_VERSION, "all-region-stats"],
   { revalidate: CACHE_SECONDS, tags: ["yoyang-eval"] },
 );
 
 const cachedNationalStats = unstable_cache(
   fetchNationalStats,
-  ["yoyang", "national-stats"],
+  [CACHE_VERSION, "national-stats"],
   { revalidate: CACHE_SECONDS, tags: ["yoyang-eval"] },
 );
 
-const cachedFacilities = unstable_cache(fetchFacilities, ["yoyang", "facilities"], {
+const cachedFacilities = unstable_cache(fetchFacilities, [CACHE_VERSION, "facilities"], {
   revalidate: CACHE_SECONDS,
   tags: ["yoyang-eval"],
 });
@@ -381,6 +396,51 @@ export function breakdownBy(
   return Array.from(counts.entries())
     .map(([label, count]) => ({ label, count, ratio: count / total }))
     .sort((a, b) => b.count - a.count);
+}
+
+/**
+ * 기관 단위로 줄인다 — code 마다 가장 최근 평가 한 건만 남긴다.
+ *
+ * yoyang_facilities 한 행은 기관이 아니라 평가 한 건이다. 그대로 목록에 뿌리면
+ * 같은 기관이 회차별로 두 번 나온다. 집계(yoyang_regions)도 같은 규칙으로
+ * 계산하므로 화면의 "기관 수"와 목록 줄 수가 어긋나지 않는다.
+ */
+export function latestPerCode(rows: Facility[]): Facility[] {
+  const best = new Map<string, Facility>();
+  for (const row of rows) {
+    const prev = best.get(row.code);
+    if (!prev || isNewer(row, prev)) best.set(row.code, row);
+  }
+  return [...best.values()];
+}
+
+/**
+ * 어느 행이 더 최근인가.
+ *
+ * 평가일자가 같을 때 id 가 큰 쪽을 고른다. 이 규칙은
+ * refresh_yoyang_aggregates() 의 `order by code, eval_date desc nulls last,
+ * id desc` 와 반드시 같아야 한다. 다르면 화면에서 센 등급 분포와 집계
+ * 테이블의 값이 한두 개씩 어긋난다.
+ */
+function isNewer(a: Facility, b: Facility): boolean {
+  const da = a.eval_date ?? "";
+  const db = b.eval_date ?? "";
+  if (da !== db) return da > db;
+  return a.id > b.id;
+}
+
+/**
+ * 급여종류별 분포용. 한 기관이 여러 급여종류를 운영하면 각각 세야 하므로
+ * (기관, 급여종류) 쌍마다 최근 평가 한 건을 남긴다.
+ */
+export function latestPerCodeAndService(rows: Facility[]): Facility[] {
+  const best = new Map<string, Facility>();
+  for (const row of rows) {
+    const key = `${row.code}|${row.service_type ?? ""}`;
+    const prev = best.get(key);
+    if (!prev || isNewer(row, prev)) best.set(key, row);
+  }
+  return [...best.values()];
 }
 
 /** 등급별 건수 (A~E + 등급없음) */

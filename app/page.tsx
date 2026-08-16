@@ -38,7 +38,7 @@ export default async function HomePage() {
           <StatTile
             label="평가 대상 기관"
             value={`${facilityTotal.toLocaleString()}곳`}
-            sub="전국"
+            sub={`전국 · 평가 ${national.eval_count.toLocaleString()}건`}
           />
           <StatTile
             label="A등급 기관"

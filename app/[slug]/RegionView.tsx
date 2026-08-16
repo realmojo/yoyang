@@ -5,6 +5,8 @@ import {
   getNationalStats,
   getRegionStats,
   gradeCounts,
+  latestPerCode,
+  latestPerCodeAndService,
   listFacilities,
   round1,
   serviceTypeLabel,
@@ -33,15 +35,24 @@ export default async function RegionView({ region }: { region: Region }) {
     return <EmptyRegion region={region} />;
   }
 
-  const counts = gradeCounts(facilities);
-  const topFacilities = facilities
+  // 한 행은 기관이 아니라 평가 한 건이다. 목록과 등급 분포는 기관 단위로
+  // 줄여서 보여준다. 그래야 집계(stats.facility_count)와 줄 수가 맞는다.
+  // 중복을 걷어내면 원래 정렬(등급 → 총점)이 흐트러지므로 다시 세운다
+  const uniqueFacilities = latestPerCode(facilities).sort((a, b) => {
+    const grade = (a.grade ?? "Z").localeCompare(b.grade ?? "Z");
+    if (grade !== 0) return grade;
+    return (b.total_score ?? -1) - (a.total_score ?? -1);
+  });
+  const counts = gradeCounts(uniqueFacilities);
+  const topFacilities = uniqueFacilities
     .filter((f) => f.grade === "A")
     .slice(0, TOP_LIMIT);
 
-  const byService = breakdownBy(facilities, (f) =>
+  // 급여종류는 한 기관이 여러 개를 운영할 수 있으므로 (기관, 급여종류) 쌍 기준
+  const byService = breakdownBy(latestPerCodeAndService(facilities), (f) =>
     serviceTypeLabel(f.service_type),
   );
-  const byFounder = breakdownBy(facilities, (f) => f.founder);
+  const byFounder = breakdownBy(uniqueFacilities, (f) => f.founder);
   const sentence = comparisonSentence(region, stats, national);
   const siblings = siblingRegions(region);
 
@@ -88,6 +99,7 @@ export default async function RegionView({ region }: { region: Region }) {
         <StatTile
           label="평가 대상 기관"
           value={`${stats.facility_count.toLocaleString()}곳`}
+          sub={`평가 ${stats.eval_count.toLocaleString()}건`}
         />
         <StatTile
           label="A등급 (최우수)"
@@ -174,12 +186,12 @@ export default async function RegionView({ region }: { region: Region }) {
 
       <section className="panel">
         <h2 className="panel__title">
-          {region.name} 전체 기관 ({facilities.length}곳)
+          {region.name} 전체 기관 ({uniqueFacilities.length}곳)
         </h2>
         <p className="panel__desc">
           등급이 높은 순, 같은 등급 안에서는 총점이 높은 순입니다.
         </p>
-        <FacilityTable facilities={facilities} regionSlug={region.slug} />
+        <FacilityTable facilities={uniqueFacilities} regionSlug={region.slug} />
       </section>
 
       <DataNotice />

@@ -11,6 +11,7 @@
  */
 
 import {
+  GRADE_LABEL,
   listFacilities,
   round1,
   serviceTypeLabel,
@@ -84,11 +85,20 @@ export interface FacilityDetail {
   serviceRankTotal: number;
 }
 
+/**
+ * 최신순 정렬. 평가일자가 같으면 id 가 큰 쪽이 앞이다.
+ * refresh_yoyang_aggregates() 의 정렬과 같은 규칙이어야 화면과 집계가 맞는다.
+ */
+function byLatest(a: Facility, b: Facility): number {
+  const da = a.eval_date ?? "";
+  const db = b.eval_date ?? "";
+  if (da !== db) return db.localeCompare(da);
+  return b.id - a.id;
+}
+
 /** 기관의 대표 총점 — 가장 최근 평가의 총점 */
 function bestScore(rows: Facility[]): number | null {
-  const sorted = [...rows].sort(
-    (a, b) => (b.eval_date ?? "").localeCompare(a.eval_date ?? ""),
-  );
+  const sorted = [...rows].sort(byLatest);
   return sorted.find((r) => r.total_score !== null)?.total_score ?? null;
 }
 
@@ -129,9 +139,7 @@ export async function getFacilityDetail(
   if (rows.length === 0) return null;
 
   // 최신 평가가 먼저 오도록
-  const sorted = [...rows].sort((a, b) =>
-    (b.eval_date ?? "").localeCompare(a.eval_date ?? ""),
-  );
+  const sorted = [...rows].sort(byLatest);
   const head = sorted[0];
   const records = sorted.map(toEvalRecord);
 
@@ -337,6 +345,76 @@ export function summarySentence(
   }
 
   return parts.join(" ");
+}
+
+/**
+ * 기관별 자주 묻는 질문.
+ *
+ * 값을 기관 데이터에서 채우므로 페이지마다 답이 다르다. FAQPage 구조화
+ * 데이터로도 내보내는데, 모든 기관이 같은 답을 쓰면 그건 구조화 데이터가
+ * 아니라 중복 문서라서 의미가 없다.
+ */
+export function buildFaq(
+  detail: FacilityDetail,
+  regionName: string,
+  stats: RegionStats | null,
+  national: NationalStats | null,
+): Array<{ q: string; a: string }> {
+  const { latest, name } = detail;
+  const regionAvg = round1(stats?.avg_total_score ?? null);
+  const natAvg = round1(national?.avg_total_score ?? null);
+  const faq: Array<{ q: string; a: string }> = [];
+
+  // 1) 등급
+  if (latest.grade) {
+    const label = GRADE_LABEL[latest.grade];
+    let a = `${formatEvalMonth(latest.date)}에 실시된 국민건강보험공단 정기평가에서 ${latest.grade}등급(${label})을 받았습니다.`;
+    if (latest.totalScore !== null) {
+      a += ` 평가총점은 ${latest.totalScore}점입니다.`;
+      if (regionAvg !== null) {
+        const diff = round1(latest.totalScore - regionAvg)!;
+        a +=
+          Math.abs(diff) < 0.5
+            ? ` ${regionName} 평균(${regionAvg}점)과 비슷한 수준입니다.`
+            : ` ${regionName} 평균(${regionAvg}점)보다 ${Math.abs(diff)}점 ${diff > 0 ? "높습니다" : "낮습니다"}.`;
+      }
+    }
+    faq.push({ q: `${name}의 장기요양기관 평가등급은 몇 등급인가요?`, a });
+  } else {
+    faq.push({
+      q: `${name}의 평가등급은 왜 표시되지 않나요?`,
+      a: "공개된 평가 결과가 없습니다. 정기평가가 급여종류별 3년 주기로 진행되기 때문에 아직 평가 회차가 돌아오지 않았거나 평가 대상이 아니었을 수 있습니다.",
+    });
+  }
+
+  // 2) 급여종류
+  faq.push({
+    q: `${name}${withParticle(name, "은는").slice(name.length)} 어떤 서비스를 제공하나요?`,
+    a: `공단 평가 자료 기준으로 ${detail.serviceLabels.join(", ")}${detail.serviceLabels.length > 1 ? " 급여를 함께 운영합니다." : " 급여를 운영합니다."} 실제 제공 서비스와 이용 조건은 기관에 직접 확인하시기 바랍니다.`,
+  });
+
+  // 3) 평가 시점 — 이 사이트가 가장 강조하는 부분
+  faq.push({
+    q: "이 평가등급은 언제 기준인가요?",
+    a: `${formatEvalMonth(latest.date)} 평가 기준입니다. 장기요양기관 정기평가는 급여종류별로 3년 주기로 진행되어 매년 이뤄지지 않습니다. 평가 이후 운영 상태가 달라졌을 수 있으므로 방문과 상담으로 확인하시기 바랍니다.`,
+  });
+
+  // 4) 주소·연락처
+  faq.push({
+    q: `${name}의 주소와 전화번호는 어디서 확인하나요?`,
+    a: "이 페이지가 쓰는 공단 평가 결과 데이터에는 주소와 연락처가 포함되어 있지 않습니다. 확인되지 않은 정보를 적지 않기 위해 비워 두었습니다. 국민건강보험공단 노인장기요양보험의 기관 찾기에서 기관명으로 검색하시면 확인할 수 있습니다.",
+  });
+
+  // 5) 순위 (계산 가능할 때만)
+  if (detail.rank !== null && detail.rankTotal > 1 && natAvg !== null) {
+    const percentile = Math.round((detail.rank / detail.rankTotal) * 100);
+    faq.push({
+      q: `${name}${withParticle(name, "은는").slice(name.length)} ${regionName}에서 어느 정도 수준인가요?`,
+      a: `평가총점 기준으로 ${regionName} 내 평가 대상 ${detail.rankTotal}곳 가운데 ${detail.rank}번째로, 상위 ${percentile}% 안에 듭니다. 다만 순위는 총점만 비교한 것이고 급여종류와 평가 시점이 기관마다 달라 그대로 우열로 읽기는 어렵습니다.`,
+    });
+  }
+
+  return faq;
 }
 
 /** 2025-09-04 → 2025년 9월 */

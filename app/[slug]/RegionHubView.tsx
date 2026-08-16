@@ -37,7 +37,7 @@ export default async function RegionHubView() {
           <StatTile
             label="평가 대상 기관"
             value={`${national.facility_count.toLocaleString()}곳`}
-            sub="전국"
+            sub={`평가 ${national.eval_count.toLocaleString()}건`}
           />
           <StatTile
             label="A등급 기관"

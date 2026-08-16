@@ -1424,23 +1424,48 @@ a.cta-btn {
   color: #a4a9a0;
 }
 
-/* ---- 이동 경로 (기관 상세 상단) ---- */
+/* ---- 이동 경로 (기관 상세 상단) ----
+   밝은 본문판 위에 얹히므로 어두운 글자를 쓴다. */
 .crumbs {
   display: flex;
   align-items: center;
   gap: 7px;
-  margin-bottom: 12px;
   font-size: 13px;
-  color: #8c94a0;
+  color: #9aa295;
 }
 
 .crumbs a {
-  color: #b3bcc8;
+  color: #6f7a68;
 }
 
 .crumbs a:hover {
-  color: var(--c-accent);
+  color: var(--c-primary);
   text-decoration: underline;
+}
+
+/* 본문 표의 행 머리(th scope="row")가 폭을 다 먹지 않게 한다 */
+.entry-content tbody th[scope="row"] {
+  width: 28%;
+  white-space: nowrap;
+}
+
+/* 좁은 화면에서는 표 안에서 가로 스크롤되게 한다.
+   페이지 전체가 가로로 밀리는 것보다 낫다. */
+@media (max-width: 640px) {
+  .entry-content table {
+    display: block;
+    overflow-x: auto;
+    font-size: 15px;
+  }
+
+  .entry-content th,
+  .entry-content td {
+    padding: 9px 10px;
+  }
+
+  .entry-content tbody th[scope="row"] {
+    width: auto;
+  }
 }
 
 /* 기관 표 안의 상세 링크 */
