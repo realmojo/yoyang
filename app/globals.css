@@ -423,7 +423,19 @@ body {
    스스로 크기를 정하도록 두고, 채울 광고가 없을 때만 자리를 없앤다.
    ========================================================================== */
 
-ins.adsbygoogle {
+/* **반드시 우리 슬롯 안으로 한정한다.**
+
+   전역 `ins.adsbygoogle` 로 걸면 구글 자동광고가 body 에 직접 꽂는
+   사이드 레일까지 잡힌다. 레일은 position: fixed 인데 인라인 스타일에 width 가
+   없다(display·z-index·position·left·top·opacity 만 넣는다). 그래서 여기 width
+   가 그대로 먹으면 **포함 블록인 뷰포트 폭**으로 부풀어, 실제 소재는 그 안의
+   160x600 인데 ins 자체는 1581px 짜리 투명 판이 된다. 그게 z-index 2147483647
+   position: fixed 로 화면 전체를 덮으면서 본문 클릭을 먹는다.
+
+   실제로 겪은 증상: 광고는 왼쪽 여백에 정상으로 보이는데 페이지 가운데가
+   눌리지 않고, DevTools 로 레일 ins 를 잡으면 1581x606 으로 나온다. */
+.ad-slot ins.adsbygoogle,
+.entry-content ins.adsbygoogle {
   display: block;
   width: 100%;
   max-width: 100%;
@@ -1564,6 +1576,16 @@ a.cta-btn {
   }
 }
 
+/* 광고는 위아래 콘텐츠와 떨어뜨린다.
+
+   .ad-slot 에 규칙이 하나도 없어서 허브·홈 화면에서 광고가 바로 아래 패널에
+   딱 붙었다. .page-head 는 margin-bottom 을 주지만 .sido-block 과 .panel 은
+   margin-top 이 없어서 광고 아래쪽 간격이 0 이 된다. 붙어 있으면 보기에도
+   나쁘고 광고가 콘텐츠의 일부처럼 읽힌다. */
+.ad-slot {
+  margin: 28px 0;
+}
+
 /* 광고 크기는 애드센스가 정한다.
    예전에는 width/max-width/margin-left 를 !important 로 덮어썼는데, 그러면
    구글이 전체폭 확장을 위해 ins 에 직접 넣는 `width: 390px; margin-left: -16px`
@@ -1584,11 +1606,17 @@ a.cta-btn {
    - 위 `.ad-slot ins.adsbygoogle { display: block !important }` 과 명시도가
      같아서, 반드시 그 뒤에 와야 이긴다. 이 블록을 위로 옮기면 미채움 슬롯이
      다시 빈 자리로 남으니 파일 끝에 두는 위치를 유지할 것.
+   - 여기도 **우리 슬롯 안으로 한정한다.** 구글 자동광고 요소를 겨냥하는 규칙은
+     남겨두지 않는다 (위 ins.adsbygoogle width 건과 같은 사고를 부른다).
    ========================================================================== */
-ins.adsbygoogle[data-ad-status^="unfill"],
 .ad-slot ins.adsbygoogle[data-ad-status^="unfill"],
 .entry-content .adsbygoogle[data-ad-status^="unfill"] {
   display: none !important;
   min-height: 0 !important;
   background: transparent !important;
+}
+
+/* 위에서 슬롯을 숨기면 .ad-slot 만 남아 여백이 뜬다. 그 여백도 걷어낸다. */
+.ad-slot:has(ins.adsbygoogle[data-ad-status^="unfill"]) {
+  margin: 0 !important;
 }
