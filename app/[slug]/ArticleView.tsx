@@ -41,13 +41,17 @@ function splitByHeading(html: string): string[] {
 }
 
 function CtaButton({ text, url }: { text: string; url: string }) {
+  // 내부 경로(/지역 등)에는 nofollow 를 붙이지 않는다. 붙이면 사이트 안에서
+  // 링크 가치가 흐르지 않는다. 바깥으로 나가는 링크에만 붙인다.
+  const isExternal = /^https?:\/\//i.test(url);
+
   return (
     <div className="cta-block">
       <a
         className="cta-btn"
         href={url}
         target="_self"
-        rel="nofollow noopener noreferrer"
+        rel={isExternal ? "nofollow noopener noreferrer" : undefined}
       >
         {text}
       </a>

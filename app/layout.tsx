@@ -10,14 +10,13 @@ const description =
   "전국 시군구별 장기요양기관 평가등급과 평가일자를 공개 데이터로 정리했습니다. 장기요양등급 신청, 비용 구조, 시설 선택 기준까지 함께 안내합니다.";
 
 /**
- * 검색엔진 소유확인 코드와 분석 도구 ID.
+ * 구글 서치콘솔 소유확인 코드.
  *
  * 서브도메인은 별도 속성이라 keywordegg 의 값을 그대로 쓸 수 없다.
- * 서치콘솔·네이버 서치어드바이저에 yoyang.keywordegg.com 을 등록한 뒤
- * 환경변수로 넣는다. 비어 있으면 해당 태그·스크립트를 아예 넣지 않는다.
+ * yoyang.keywordegg.com 을 등록한 뒤 환경변수로 넣는다.
+ * 비어 있으면 해당 메타 태그를 아예 넣지 않는다.
  */
 const GOOGLE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION ?? "";
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? "";
 
 export const metadata: Metadata = {
   ...buildMetadata({
