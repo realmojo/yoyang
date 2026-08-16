@@ -1,4 +1,5 @@
 import GradeBadge from "@/components/region/GradeBadge";
+import { facilitySlug } from "@/lib/facility";
 import {
   formatEvalDate,
   serviceTypeLabel,
@@ -13,9 +14,12 @@ import {
  */
 export default function FacilityTable({
   facilities,
+  regionSlug,
   showScore = true,
 }: {
   facilities: Facility[];
+  /** 주면 기관명이 상세 페이지 링크가 된다 */
+  regionSlug?: string;
   showScore?: boolean;
 }) {
   if (facilities.length === 0) {
@@ -43,7 +47,17 @@ export default function FacilityTable({
           {facilities.map((f) => (
             <tr key={f.id}>
               <td>
-                <span className="fac-table__name">{f.name}</span>
+                {regionSlug ? (
+                  <a
+                    target="_self"
+                    href={`/${regionSlug}/${f.slug ?? facilitySlug(f.name, f.code)}`}
+                    className="fac-table__name fac-table__link"
+                  >
+                    {f.name}
+                  </a>
+                ) : (
+                  <span className="fac-table__name">{f.name}</span>
+                )}
                 <span className="fac-table__meta">
                   {[
                     // 일반구를 시로 합쳤으므로 원래 구 이름을 여기서 되살린다

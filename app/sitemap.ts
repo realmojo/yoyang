@@ -2,7 +2,11 @@ import { MetadataRoute } from "next";
 import { SITE_LINKS } from "@/lib/menu";
 import { CATEGORIES, CONTENTS_TABLE } from "@/lib/contents";
 import { REGION_HUB_SLUG } from "@/lib/regions";
-import { getAllRegionStats, regionsWithData } from "@/lib/region-data";
+import {
+  FACILITIES_TABLE,
+  getAllRegionStats,
+  regionsWithData,
+} from "@/lib/region-data";
 import { absoluteUrl } from "@/lib/seo";
 import { supabaseAdmin } from "@/lib/supabase";
 
@@ -44,6 +48,57 @@ async function regionEntries(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     };
   });
+}
+
+/**
+ * 기관 상세 페이지.
+ *
+ * 21,000곳이 넘어서 사이트맵의 대부분을 차지한다. 사이트맵 한 파일의 상한은
+ * URL 50,000개라 아직 한 파일에 들어가지만, 기관이 더 늘어나면 나눠야 한다.
+ *
+ * 기관 단위로 하나씩만 넣는다. 같은 기관이 급여종류·평가회차별로 여러 행이라
+ * 그대로 넣으면 같은 URL 이 여러 번 들어간다.
+ */
+async function facilityEntries(): Promise<MetadataRoute.Sitemap> {
+  if (!supabaseAdmin) return [];
+
+  const seen = new Set<string>();
+  const entries: MetadataRoute.Sitemap = [];
+
+  try {
+    for (let from = 0; from < 60000; from += 1000) {
+      const { data, error } = await supabaseAdmin
+        .from(FACILITIES_TABLE)
+        .select("region_slug, slug, eval_date")
+        .not("slug", "is", null)
+        .order("id", { ascending: true })
+        .range(from, from + 999);
+
+      if (error || !data?.length) break;
+
+      for (const row of data as {
+        region_slug: string;
+        slug: string;
+        eval_date: string | null;
+      }[]) {
+        const url = `/${row.region_slug}/${row.slug}`;
+        if (seen.has(url)) continue;
+        seen.add(url);
+        entries.push({
+          url: absoluteUrl(url),
+          lastModified: row.eval_date ? new Date(row.eval_date) : new Date(),
+          changeFrequency: "yearly" as const,
+          priority: 0.5,
+        });
+      }
+
+      if (data.length < 1000) break;
+    }
+  } catch {
+    return entries;
+  }
+
+  return entries;
 }
 
 /** 가이드 글 (Supabase 는 요청당 1000행이 상한이라 나눠서 받는다) */
@@ -101,5 +156,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticEntries,
     ...(await regionEntries()),
     ...(await contentEntries()),
+    ...(await facilityEntries()),
   ];
 }

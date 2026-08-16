@@ -1424,6 +1424,37 @@ a.cta-btn {
   color: #a4a9a0;
 }
 
+/* ---- 이동 경로 (기관 상세 상단) ---- */
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #8c94a0;
+}
+
+.crumbs a {
+  color: #b3bcc8;
+}
+
+.crumbs a:hover {
+  color: var(--c-accent);
+  text-decoration: underline;
+}
+
+/* 기관 표 안의 상세 링크 */
+.fac-table__link {
+  color: var(--c-primary-dark);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: rgb(107 127 86 / 0.35);
+}
+
+.fac-table__link:hover {
+  text-decoration-color: var(--c-primary);
+}
+
 /* ---- 주의 문구 ---- */
 .notice {
   background: #fff8e8;

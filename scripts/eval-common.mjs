@@ -52,6 +52,27 @@ export function rollupSigungu(raw) {
   return { sigungu: m[1].replace(/\s+/g, ""), detail: m[2] };
 }
 
+/**
+ * 기관 상세 URL 슬러그. lib/facility.ts 의 facilitySlug 와 같은 규칙이다.
+ *
+ * "{정리한 이름}-{기관기호 숫자}" 형태다. 기관기호를 항상 붙여서 같은 이름이
+ * 겹쳐도(같은 시군구 안에 266쌍 있다) 부딪히지 않게 한다.
+ *
+ * 기관명에는 (주), A+, 따옴표, 괄호 안 부설 안내 같은 것이 섞여 있어서
+ * 한글·영숫자만 남기고 나머지는 하이픈으로 바꾼다.
+ */
+export function facilitySlug(name, code) {
+  const digits = String(code ?? "").replace(/[^0-9]/g, "");
+  const base = String(name ?? "")
+    .toLowerCase()
+    .replace(/[^가-힣ㄱ-ㅎㅏ-ㅣa-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40)
+    .replace(/-+$/g, "");
+
+  return base ? `${base}-${digits}` : digits;
+}
+
 /** 알고 있는 슬러그 전체 (검증용) */
 export const KNOWN_SLUGS = new Set();
 for (const sido of SIDOS) {
@@ -213,6 +234,7 @@ export function normalizeRows(rows, found) {
     records.push({
       code,
       name,
+      slug: facilitySlug(name, code),
       service_type: nullable(get("service_type")),
       founder: nullable(get("founder")),
       sido: sidoShort,

@@ -136,7 +136,7 @@ export default async function RegionView({ region }: { region: Region }) {
             평가등급 A를 받은 기관입니다. 등급은 평가일자 기준이며, 그 이후의
             변화는 반영되지 않습니다.
           </p>
-          <FacilityTable facilities={topFacilities} />
+          <FacilityTable facilities={topFacilities} regionSlug={region.slug} />
         </section>
       )}
 
@@ -179,7 +179,7 @@ export default async function RegionView({ region }: { region: Region }) {
         <p className="panel__desc">
           등급이 높은 순, 같은 등급 안에서는 총점이 높은 순입니다.
         </p>
-        <FacilityTable facilities={facilities} />
+        <FacilityTable facilities={facilities} regionSlug={region.slug} />
       </section>
 
       <DataNotice />

@@ -86,6 +86,8 @@ export interface Facility {
   /** 장기요양기관기호 */
   code: string;
   name: string;
+  /** 기관 상세 URL. `/{region_slug}/{slug}` (lib/facility.ts 참고) */
+  slug: string | null;
   /** 급여종류. 예: 노인요양시설, 방문요양 */
   service_type: string | null;
   /** 설립주체. 예: 개인, 법인, 지자체 */
@@ -172,7 +174,7 @@ export interface NationalStats {
 }
 
 const FACILITY_COLUMNS = [
-  "id, code, name, service_type, founder",
+  "id, code, name, slug, service_type, founder",
   "region_slug, sido, sigungu, sigungu_detail",
   "eval_type, eval_date, eval_round, eval_system, grade, total_score",
   "score_operation, score_safety, score_rights, score_process, score_result",
