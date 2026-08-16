@@ -52,7 +52,6 @@ img {
   --cat-grade: #c49a1a;
   --cat-cost: #5a9e6f;
   --cat-facility: #7a8fc4;
-  --cat-home: #9b7ec8;
 
   /* 평가등급 색 A(최우수) → E(미흡) */
   --grade-a: #2f8f5b;
@@ -206,11 +205,6 @@ body {
 .cat-badge--facility {
   color: var(--cat-facility);
   background: rgb(122 143 196 / 0.12);
-}
-
-.cat-badge--home {
-  color: var(--cat-home);
-  background: rgb(155 126 200 / 0.12);
 }
 
 /* 지역 뱃지 (시도명) */

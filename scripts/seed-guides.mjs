@@ -27,7 +27,7 @@ dotenv.config({ path: path.join(ROOT, ".env.local") });
 const GUIDES_DIR = path.join(ROOT, "data/guides");
 
 /** lib/contents.ts 의 CATEGORIES 와 맞춰야 한다 */
-const CATEGORIES = ["등급", "비용", "시설", "재가"];
+const CATEGORIES = ["등급", "비용", "시설"];
 
 /** lib/regions.ts 의 REGION_HUB_SLUG */
 const HUB_SLUG = "지역";

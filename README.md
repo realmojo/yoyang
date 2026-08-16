@@ -17,7 +17,7 @@ keywordegg 와 같은 스택(Next.js + Supabase + Cloudflare Workers)과 같은 
 | `/지역` | 시도·시군구 허브 | `REGION_HUB_SLUG` (`lib/regions.ts`) |
 | `/서울-강남구` | 지역 상세 | `REGIONS` (`data/regions.json`) |
 | `/광주-동구/해피맘요양원-12911000256` | 기관 상세 | `yoyang_facilities.slug` |
-| `/등급` `/비용` `/시설` `/재가` | 가이드 카테고리 | `CATEGORIES` (`lib/contents.ts`) |
+| `/등급` `/비용` `/시설` | 가이드 카테고리 | `CATEGORIES` (`lib/contents.ts`) |
 | `/장기요양등급-신청방법` | 가이드 글 | `yoyang_contents.slug` |
 | `/about` `/contact` `/privacy` `/terms` | 안내 페이지 | 각 디렉터리 |
 
@@ -50,8 +50,29 @@ canonical 만 새 주소를 가리킨다.
 - 회차별 평가 이력 (3,588곳은 2회 이상)
 
 계산은 지역 목록 조회 하나를 재사용하므로 질의가 늘지 않는다.
-색인 부담이 커지면 사이트맵에서 기관 URL 을 빼는 것부터 검토할 것
-(`app/sitemap.ts` 의 `facilityEntries`).
+
+### 사이트맵은 인덱스로 쪼갠다
+
+URL 이 21,000개가 넘어 한 파일로는 생성도 느리고 서치콘솔 제출도 실패한다.
+
+```
+/sitemap.xml                  인덱스 (아래를 가리킨다)
+/sitemap-pages.xml            홈·카테고리·안내·지역·가이드   242개
+/sitemap-facilities/1.xml     기관 1~1000
+...
+/sitemap-facilities/22.xml    기관 21001~21216
+```
+
+**청크 크기 1,000은 임의로 고른 값이 아니다.** Supabase(PostgREST)가 한 응답에
+1,000행까지만 돌려주기 때문이다. 이보다 크게 잡으면 나머지가 조용히 잘려서
+사이트맵은 정상으로 보이는데 실제로는 일부 URL 이 제출되지 않는다.
+올리려면 Supabase 의 max-rows 설정부터 올려야 한다.
+
+기관 URL 중복 제거는 DB 함수 `yoyang_facility_urls()` 가 맡는다. 한 행이 기관이
+아니라 평가 한 건이라, 행 오프셋으로 자르면 같은 기관이 두 파일에 걸쳐 들어간다.
+
+색인 부담이 커지면 인덱스에서 기관 사이트맵을 빼는 것부터 검토할 것
+(`app/sitemap.xml/route.ts`). 내부 링크로는 계속 발견되고 제출만 멈춘다.
 
 ---
 

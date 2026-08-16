@@ -3,7 +3,7 @@ import { ContentCard } from "@/components/contents/ContentCard";
 import Adsense from "@/components/Adsense";
 import { AD_SLOTS } from "@/lib/ads";
 
-/** 가이드 카테고리 목록 `/등급`, `/비용`, `/시설`, `/재가` */
+/** 가이드 카테고리 목록 `/등급`, `/비용`, `/시설` */
 export default async function CategoryView({
   category,
   page,

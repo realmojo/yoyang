@@ -12,12 +12,12 @@ export const CONTENTS_TABLE = "yoyang_contents";
 export const PER_PAGE = 12;
 
 /** 카테고리 슬러그는 URL 에 그대로 들어간다 (한글 슬러그 정책) */
-export type CategorySlug = "등급" | "비용" | "시설" | "재가";
+export type CategorySlug = "등급" | "비용" | "시설";
 
 export interface Category {
   slug: CategorySlug;
   /** CSS 클래스(cat-badge--{key})에 쓰는 영문 키 */
-  key: "grade" | "cost" | "facility" | "home";
+  key: "grade" | "cost" | "facility";
   name: string;
   description: string;
   emoji: string;
@@ -45,16 +45,8 @@ export const CATEGORIES: Category[] = [
     key: "facility",
     name: "시설 선택",
     description:
-      "요양원과 요양병원의 차이, 평가등급 읽는 법, 계약 전 확인할 것들을 다룹니다.",
+      "시설에 모실지 집에서 받을지, 평가등급은 어떻게 읽는지, 계약 전에 확인할 것은 무엇인지 다룹니다.",
     emoji: "🏥",
-  },
-  {
-    slug: "재가",
-    key: "home",
-    name: "재가·복지용구",
-    description:
-      "방문요양·주야간보호 같은 재가급여와 복지용구 지원 항목을 안내합니다.",
-    emoji: "🏠",
   },
 ];
 
