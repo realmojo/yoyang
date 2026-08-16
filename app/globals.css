@@ -1,0 +1,1502 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   전역 기본값
+   keywordegg 의 콘텐츠 스킨을 그대로 옮겼다. 게시판·도구 페이지용 레거시
+   스타일(#gb-*, .legacy-shell)은 이 사이트에 해당 화면이 없어 제외했다.
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: none;
+}
+
+body {
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* ==========================================================================
+   콘텐츠 사이트 스킨 (2026-08 개편)
+   금융/건강/생활/IT 4개 카테고리를 다루는 워드프레스형 정보 사이트.
+   다크 셸(배경·헤더·푸터) 위에 밝은 카드/본문을 얹는 구조.
+   ========================================================================== */
+
+:root {
+  --c-primary: #6b7f56;
+  --c-primary-light: #eef1ea;
+  --c-primary-dark: #3d4a33;
+  --c-accent: #b8c89e;
+  --c-bg: #212832;
+  --c-surface: #f9f9f7;
+  --c-dark-surface: #171d26;
+  --c-text: #2a2a2a;
+  --c-text-sub: #6b7280;
+  --c-line: #ededea;
+
+  /* 가이드 카테고리 색 (lib/contents.ts 의 key 와 짝이 맞아야 한다) */
+  --cat-grade: #c49a1a;
+  --cat-cost: #5a9e6f;
+  --cat-facility: #7a8fc4;
+  --cat-home: #9b7ec8;
+
+  /* 평가등급 색 A(최우수) → E(미흡) */
+  --grade-a: #2f8f5b;
+  --grade-b: #5a9e6f;
+  --grade-c: #c49a1a;
+  --grade-d: #d08540;
+  --grade-e: #c05555;
+
+  --r-md: 14px;
+  --r-lg: 18px;
+  --sh-sm: 0 1px 3px rgb(0 0 0 / 0.06);
+  --sh-md: 0 4px 16px rgb(0 0 0 / 0.08);
+
+  --w-home: 880px;
+  --w-single: 680px;
+  --font-content: "Pretendard Variable", Pretendard, -apple-system,
+    BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", system-ui,
+    sans-serif;
+}
+
+body {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-content);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- 헤더 ---- */
+.site-header {
+  background: var(--c-dark-surface);
+  border-bottom: 1px solid #2c3542;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.site-header__inner {
+  max-width: var(--w-home);
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.site-logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 19px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.site-nav a {
+  padding: 7px 13px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #b3bcc8;
+  border-radius: 20px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.site-nav a:hover {
+  color: #fff;
+}
+
+.site-nav a.is-active {
+  color: var(--c-accent);
+  background: rgb(143 168 115 / 0.15);
+}
+
+/* ---- 본문 컨테이너 ---- */
+.site-main {
+  max-width: var(--w-home);
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+  min-height: 60vh;
+}
+
+/* ---- 섹션 제목 ---- */
+.sec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.sec-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.sec-title::before {
+  content: "";
+  width: 4px;
+  height: 20px;
+  background: var(--c-primary);
+  border-radius: 2px;
+}
+
+.sec-more {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #999;
+  border: 1px solid #3b4554;
+  border-radius: 20px;
+  transition: all 0.2s;
+}
+
+.sec-more:hover {
+  background: rgb(143 168 115 / 0.15);
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+}
+
+/* ---- 카테고리 뱃지 ---- */
+.cat-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cat-badge--grade {
+  color: var(--cat-grade);
+  background: rgb(196 154 26 / 0.12);
+}
+
+.cat-badge--cost {
+  color: var(--cat-cost);
+  background: rgb(90 158 111 / 0.12);
+}
+
+.cat-badge--facility {
+  color: var(--cat-facility);
+  background: rgb(122 143 196 / 0.12);
+}
+
+.cat-badge--home {
+  color: var(--cat-home);
+  background: rgb(155 126 200 / 0.12);
+}
+
+/* 지역 뱃지 (시도명) */
+.cat-badge--region {
+  color: var(--c-primary-dark);
+  background: rgb(107 127 86 / 0.14);
+}
+
+/* ---- 카드 공통 ---- */
+.card {
+  display: block;
+  background: var(--c-surface);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  box-shadow: var(--sh-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
+  color: inherit;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sh-md);
+}
+
+.card__img {
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(135deg, #e8ebe4, #d6dccd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  overflow: hidden;
+}
+
+.card__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card__body {
+  padding: 14px 16px 16px;
+}
+
+.card__title {
+  margin: 7px 0 6px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--c-text);
+  word-break: keep-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card__excerpt {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--c-text-sub);
+  word-break: keep-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card__meta {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #9aa1a8;
+}
+
+/* ---- 히어로 ---- */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.hero .card--main .card__img {
+  aspect-ratio: 16 / 10;
+  font-size: 48px;
+}
+
+.hero .card--main .card__title {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* ---- 그리드 / 리스트 ---- */
+.post-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.post-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.post-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 14px;
+  background: var(--c-surface);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  box-shadow: var(--sh-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
+  color: inherit;
+}
+
+.post-row:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sh-md);
+}
+
+.post-row__img {
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(135deg, #e8ebe4, #d6dccd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.post-row__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.post-row__body {
+  padding: 12px 16px 12px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ---- 카테고리 진입 카드 ---- */
+.bento-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.bento-card {
+  display: block;
+  padding: 22px 24px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-sm);
+  transition: all 0.2s;
+  color: inherit;
+}
+
+.bento-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sh-md);
+}
+
+.bento-card__icon {
+  font-size: 26px;
+}
+
+.bento-card__title {
+  margin: 8px 0 4px;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.bento-card__desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--c-text-sub);
+  word-break: keep-all;
+}
+
+/* ---- 페이지 헤더(카테고리) ---- */
+.page-head {
+  margin-bottom: 22px;
+}
+
+.page-head h1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.page-head p {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #9aa1a8;
+  word-break: keep-all;
+}
+
+/* ==========================================================================
+   광고 영역
+
+   높이를 미리 잡아두지 않는다. 애드센스가 슬롯 설정과 화면 폭에 맞춰
+   스스로 크기를 정하도록 두고, 채울 광고가 없을 때만 자리를 없앤다.
+   ========================================================================== */
+
+ins.adsbygoogle {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 미채움 슬롯을 없애는 규칙은 파일 맨 끝에 있다.
+   아래 `.ad-slot ins.adsbygoogle { display: block !important }` 보다
+   뒤에 와야 이기기 때문이다. (검색어: data-ad-status unfill) */
+
+/* ---- 글 상세 ---- */
+.single-wrap {
+  max-width: var(--w-single);
+  margin: 0 auto;
+}
+
+.single-article {
+  background: var(--c-surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-md);
+  overflow: hidden;
+}
+
+.single-article__inner {
+  padding: 32px 36px 40px;
+}
+
+.entry-header {
+  border-bottom: 1px solid var(--c-line);
+  margin-bottom: 26px;
+}
+
+.entry-title {
+  margin: 10px 0 12px;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: var(--c-text);
+  word-break: keep-all;
+}
+
+.entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: #9aa1a8;
+}
+
+/* ---- 글 상세: 제목 아래 메타 줄 ---- */
+.entry-header__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.entry-meta__sep {
+  width: 1px;
+  height: 12px;
+  background: #d8dad4;
+}
+
+.entry-cat {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ---- 대표 이미지 ---- */
+.entry-thumb {
+  margin: 26px 0 28px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, #e8ebe4, #d6dccd);
+}
+
+.entry-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---- 제목 아래 소개글 ---- */
+.entry-lead {
+  margin: 0 0 4px;
+  padding: 16px 18px;
+  background: #f3f4f1;
+  border-left: 3px solid var(--c-accent);
+  border-radius: 0 10px 10px 0;
+  font-size: 17px;
+  line-height: 1.8;
+  color: #4a4f45;
+  word-break: keep-all;
+}
+
+/* ---- CTA 버튼 ---- */
+.cta-block {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 32px 0;
+  text-align: center;
+}
+
+.cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 68px;
+  padding: 20px 24px;
+  border-radius: var(--r-md);
+  /* 페이지 배경과 같은 색 + 흰 글씨 */
+  background: var(--c-bg);
+  box-shadow: 0 4px 14px rgb(33 40 50 / 0.28);
+  color: #fff;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-decoration: none;
+  word-break: keep-all;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.cta-btn::after {
+  content: "→";
+  font-size: 1.05em;
+  line-height: 1;
+}
+
+.cta-btn:hover {
+  transform: translateY(-1px);
+  background: #2a3441;
+  box-shadow: 0 6px 18px rgb(33 40 50 / 0.36);
+}
+
+/* ---- 자주 묻는 질문 ---- */
+.faq {
+  margin-top: 2.5em;
+}
+
+.faq__title {
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--c-line);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--c-text);
+}
+
+.faq__item {
+  margin-bottom: 20px;
+}
+
+.faq__q {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--c-text);
+  word-break: keep-all;
+}
+
+.faq__q::before {
+  content: "Q.";
+  color: var(--c-primary);
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.faq__a {
+  font-size: 18px;
+  line-height: 1.9;
+  color: #4a4f45;
+  word-break: keep-all;
+}
+
+/* 목차 */
+.toc {
+  margin: 0 0 28px;
+  padding: 18px 22px;
+  background: var(--c-primary-light);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+}
+
+.toc__title {
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--c-primary-dark);
+}
+
+.toc__list {
+  margin: 0;
+  padding-left: 1.2em;
+  list-style: decimal;
+  list-style-position: outside;
+  font-size: 15px;
+  color: #8a8f83;
+}
+
+.toc__list li {
+  margin-bottom: 5px;
+  line-height: 1.65;
+}
+
+.toc__list a {
+  color: var(--c-primary-dark);
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.toc__list a:hover {
+  text-decoration: underline;
+}
+
+.toc__list li[data-depth="3"] {
+  padding-left: 14px;
+  font-size: 14px;
+}
+
+/* 본문 타이포그래피 */
+.entry-content {
+  font-size: 19px;
+  line-height: 1.85;
+  color: var(--c-text);
+  word-break: keep-all;
+}
+
+.entry-content > * + * {
+  margin-top: 1.2em;
+}
+
+.entry-content p {
+  margin-bottom: 1.3em;
+}
+
+.entry-content h2 {
+  margin: 2.2em 0 0.7em;
+  padding-left: 13px;
+  border-left: 4px solid var(--c-primary);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.4;
+  scroll-margin-top: 76px;
+}
+
+.entry-content h3 {
+  margin: 1.7em 0 0.5em;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.45;
+  scroll-margin-top: 76px;
+}
+
+.entry-content h4 {
+  margin: 1.4em 0 0.4em;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.entry-content ul,
+.entry-content ol {
+  margin: 1em 0 1.3em;
+  padding-left: 22px;
+}
+
+.entry-content ul {
+  list-style: disc;
+}
+
+.entry-content ol {
+  list-style: decimal;
+}
+
+.entry-content li {
+  margin-bottom: 0.45em;
+  line-height: 1.8;
+}
+
+.entry-content a {
+  color: var(--c-primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgb(107 127 86 / 0.35);
+  text-underline-offset: 3px;
+}
+
+/* CTA 버튼과 목차 링크는 본문 링크 규칙(색·밑줄)을 따르지 않는다.
+   .entry-content a 가 .cta-btn 보다 우선순위가 높아 명시적으로 덮어쓴다. */
+.entry-content a.cta-btn,
+a.cta-btn {
+  color: #fff;
+  text-decoration: none;
+}
+
+.entry-content .toc__list a {
+  color: var(--c-primary-dark);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.entry-content .toc__list a:hover {
+  text-decoration: underline;
+}
+
+.entry-content strong {
+  font-weight: 700;
+}
+
+.entry-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.entry-content blockquote {
+  margin: 1.4em 0;
+  padding: 14px 18px;
+  border-left: 3px solid var(--c-accent);
+  background: #f2f4ef;
+  border-radius: 0 8px 8px 0;
+  color: #4b5343;
+}
+
+.entry-content pre {
+  margin: 1.4em 0;
+  padding: 14px 16px;
+  overflow-x: auto;
+  background: #f1f2f0;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.entry-content code {
+  padding: 2px 6px;
+  background: #eff0ed;
+  border-radius: 4px;
+  font-size: 0.92em;
+}
+
+.entry-content pre code {
+  padding: 0;
+  background: none;
+}
+
+.entry-content table {
+  width: 100%;
+  margin: 1.4em 0;
+  border-collapse: collapse;
+  font-size: 17px;
+}
+
+.entry-content th,
+.entry-content td {
+  padding: 11px 14px;
+  border: 1px solid #e2e5df;
+  text-align: left;
+  vertical-align: top;
+}
+
+.entry-content th {
+  background: #f2f4ef;
+  font-weight: 700;
+}
+
+.entry-content hr {
+  margin: 2em 0;
+  border: 0;
+  border-top: 1px solid var(--c-line);
+}
+
+/* 태그 */
+.entry-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--c-line);
+}
+
+.entry-tags a {
+  padding: 5px 11px;
+  background: #f1f2ef;
+  border-radius: 14px;
+  font-size: 12px;
+  color: var(--c-text-sub);
+}
+
+/* 관련글 */
+.related {
+  margin-top: 36px;
+}
+
+.related {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--c-line);
+}
+
+.related__title {
+  position: relative;
+  margin: 0 0 16px;
+  padding-left: 14px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--c-text);
+}
+
+.related__title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 4px;
+  background: var(--c-primary);
+  border-radius: 2px;
+}
+
+.related__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.related__item {
+  display: block;
+  color: var(--c-text);
+}
+
+.related__thumb {
+  aspect-ratio: 16 / 9;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #e8ebe4, #d6dccd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.related__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.related__name {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+  word-break: keep-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---- 글 하단 정보 ---- */
+.entry-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--c-line);
+  font-size: 13px;
+  color: #9aa1a8;
+}
+
+.entry-footer a {
+  color: var(--c-primary);
+  font-weight: 600;
+}
+
+/* ---- 페이지네이션 ---- */
+.pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 32px;
+}
+
+.pager a,
+.pager span {
+  min-width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border: 1px solid #3b4554;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #b3bcc8;
+}
+
+.pager a:hover {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+}
+
+.pager .is-current {
+  background: var(--c-primary);
+  border-color: var(--c-primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ---- 빈 목록 ---- */
+.empty-box {
+  padding: 60px 20px;
+  text-align: center;
+  background: var(--c-surface);
+  border-radius: var(--r-md);
+  color: var(--c-text-sub);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* ---- 푸터 ---- */
+.site-footer {
+  background: var(--c-dark-surface);
+  border-top: 1px solid #2c3542;
+  color: #94a0af;
+  padding: 40px 20px 32px;
+}
+
+.site-footer__inner {
+  max-width: var(--w-home);
+  margin: 0 auto;
+}
+
+.site-footer__top {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 28px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid #2c3542;
+}
+
+.site-footer__logo {
+  font-size: 17px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.site-footer__desc {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+
+.site-footer__col h3 {
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #d8dde3;
+}
+
+.site-footer__col ul {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13px;
+}
+
+.site-footer__col a:hover {
+  color: var(--c-accent);
+}
+
+.site-footer__bottom {
+  padding-top: 20px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.site-footer__note {
+  margin-top: 6px;
+  color: #7d8998;
+}
+
+/* ==========================================================================
+   반응형
+   ========================================================================== */
+@media (max-width: 768px) {
+  .site-header__inner {
+    height: 52px;
+    padding: 0 12px;
+    gap: 10px;
+  }
+
+  .site-logo {
+    font-size: 17px;
+  }
+
+  .site-nav {
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .site-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .site-nav a {
+    padding: 5px 9px;
+    font-size: 13px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .site-main {
+    padding: 18px 14px 44px;
+  }
+
+  .hero,
+  .post-grid,
+  .post-grid--3,
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero .card--main .card__title {
+    font-size: 19px;
+  }
+
+  .post-row {
+    grid-template-columns: 104px 1fr;
+  }
+
+  .single-article__inner {
+    padding: 24px 20px 32px;
+  }
+
+  .entry-title {
+    font-size: 23px;
+  }
+
+  .entry-content {
+    font-size: 18px;
+  }
+
+  .entry-content h2 {
+    font-size: 21px;
+  }
+
+  .entry-content h3 {
+    font-size: 19px;
+  }
+
+  .entry-content table {
+    display: block;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+
+  .site-footer__top {
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-main {
+    padding: 14px 0px 36px;
+  }
+
+  .single-article__inner {
+    padding: 20px 16px 28px;
+  }
+
+  .entry-title {
+    font-size: 21px;
+  }
+
+  .entry-content {
+    font-size: 17px;
+  }
+
+  .entry-content h2 {
+    font-size: 20px;
+  }
+
+  .entry-content h3 {
+    font-size: 18px;
+  }
+
+  .post-row {
+    grid-template-columns: 92px 1fr;
+  }
+
+  .site-footer__top {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- 글 상세 템플릿 반응형 ---- */
+@media (max-width: 768px) {
+  .entry-header__bottom {
+    gap: 8px;
+  }
+
+  .cta-btn {
+    min-height: 60px;
+    padding: 16px 18px;
+    font-size: 17px;
+  }
+
+  .related__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .faq__title {
+    font-size: 18px;
+  }
+
+  .faq__q {
+    font-size: 16px;
+  }
+
+  .faq__a {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cta-btn {
+    min-height: 56px;
+    font-size: 16px;
+  }
+
+  .entry-thumb {
+    margin: 20px 0 22px;
+  }
+}
+/* ==========================================================================
+   지역 페이지 (yoyang 전용)
+   카드·뱃지·타이포는 위 콘텐츠 스킨을 그대로 쓰고, 여기서는 지역 페이지에만
+   나오는 요소(통계 타일, 등급 뱃지, 기관 표, 시도별 목록)를 더한다.
+   ========================================================================== */
+
+/* ---- 평가등급 뱃지 ---- */
+.grade-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.grade-badge--A { background: var(--grade-a); }
+.grade-badge--B { background: var(--grade-b); }
+.grade-badge--C { background: var(--grade-c); }
+.grade-badge--D { background: var(--grade-d); }
+.grade-badge--E { background: var(--grade-e); }
+.grade-badge--none {
+  background: #d7d9d4;
+  color: #6b7280;
+}
+
+/* 페이지 제목 위에 얹는 지역/카테고리 뱃지 */
+.page-head .cat-badge {
+  margin-bottom: 9px;
+}
+
+/* ---- 통계 타일 ---- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-tile {
+  background: var(--c-surface);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-sm);
+  padding: 16px 14px;
+  text-align: center;
+}
+
+.stat-tile__label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text-sub);
+}
+
+.stat-tile__value {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--c-primary-dark);
+  line-height: 1.2;
+}
+
+.stat-tile__sub {
+  margin: 5px 0 0;
+  font-size: 11px;
+  color: var(--c-text-sub);
+}
+
+/* ---- 밝은 판(지역 페이지 섹션) ---- */
+.panel {
+  background: var(--c-surface);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-sm);
+  padding: 20px 22px;
+  margin-bottom: 20px;
+}
+
+.panel__title {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--c-text);
+}
+
+.panel__desc {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--c-text-sub);
+  line-height: 1.7;
+}
+
+/* ---- 기관 표 ---- */
+.fac-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.fac-table th,
+.fac-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--c-line);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.fac-table th {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-text-sub);
+  border-bottom: 2px solid #e2e4de;
+  white-space: nowrap;
+}
+
+.fac-table td.is-num,
+.fac-table th.is-num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.fac-table__name {
+  font-weight: 600;
+  word-break: keep-all;
+}
+
+.fac-table__meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--c-text-sub);
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ---- 막대 (영역별 점수 비교) ---- */
+.bar-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 92px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.bar-row__label {
+  color: var(--c-text-sub);
+  font-weight: 600;
+}
+
+.bar-row__track {
+  position: relative;
+  height: 10px;
+  border-radius: 5px;
+  background: #eceee8;
+  overflow: hidden;
+}
+
+.bar-row__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 5px;
+  background: var(--c-primary);
+}
+
+.bar-row__value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text);
+  font-weight: 700;
+}
+
+.bar-row__diff {
+  margin-left: 5px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.bar-row__diff.is-up { color: var(--grade-a); }
+.bar-row__diff.is-down { color: var(--grade-e); }
+
+/* ---- 시도별 지역 목록 (지역 허브) ---- */
+.sido-block {
+  background: var(--c-surface);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-sm);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+
+.sido-block__title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sido-block__count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text-sub);
+}
+
+.region-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.region-chips a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #495244;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.region-chips a:hover {
+  background: var(--c-primary-light);
+  border-color: var(--c-accent);
+}
+
+.region-chips a[data-empty="true"] {
+  color: #a4a9a0;
+}
+
+/* ---- 주의 문구 ---- */
+.notice {
+  background: #fff8e8;
+  border: 1px solid #f0e0b8;
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  line-height: 1.75;
+  color: #6b5a2a;
+}
+
+.notice strong {
+  font-weight: 700;
+}
+
+.notice--muted {
+  background: #f3f4f1;
+  border-color: #e2e4de;
+  color: #5c6357;
+}
+
+/* ---- 인접 지역 이동 ---- */
+.nearby-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+@media (max-width: 768px) {
+  .stat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .panel {
+    padding: 16px 14px;
+  }
+
+  .bar-row {
+    grid-template-columns: 84px 1fr 82px;
+    font-size: 12px;
+  }
+
+  .fac-table {
+    font-size: 13px;
+  }
+}
+
+/* 광고 크기는 애드센스가 정한다.
+   예전에는 width/max-width/margin-left 를 !important 로 덮어썼는데, 그러면
+   구글이 전체폭 확장을 위해 ins 에 직접 넣는 `width: 390px; margin-left: -16px`
+   가 무효화된다. 구글은 390px 기준으로 소재를 받아오는데 자리는 358px 이라
+   크기가 어긋났고, 그걸 JS 가 transform 으로 또 보정하면서 3중으로 충돌했다.
+   여기서는 정렬만 잡고 크기에는 손대지 않는다. */
+.ad-slot ins.adsbygoogle,
+.entry-content .adsbygoogle {
+  display: block !important;
+  text-align: center;
+}
+
+/* ==========================================================================
+   채울 광고가 없는 슬롯은 빈 공간을 남기지 않는다.
+
+   - 구글은 미채움을 unfilled 뿐 아니라 unfill-optimized 로도 표기하므로
+     정확히 일치가 아닌 접두사(^=)로 잡는다.
+   - 위 `.ad-slot ins.adsbygoogle { display: block !important }` 과 명시도가
+     같아서, 반드시 그 뒤에 와야 이긴다. 이 블록을 위로 옮기면 미채움 슬롯이
+     다시 빈 자리로 남으니 파일 끝에 두는 위치를 유지할 것.
+   ========================================================================== */
+ins.adsbygoogle[data-ad-status^="unfill"],
+.ad-slot ins.adsbygoogle[data-ad-status^="unfill"],
+.entry-content .adsbygoogle[data-ad-status^="unfill"] {
+  display: none !important;
+  min-height: 0 !important;
+  background: transparent !important;
+}

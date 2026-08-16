@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "yoyang",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-07-29",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+
+  // 대시보드(Workers > Settings > Variables)에서 설정한 환경변수·시크릿을
+  // 배포할 때 지우지 않는다. false(기본값)면 이 파일의 vars 로 전부 덮어쓴다.
+  "keep_vars": true,
+
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+
+  // 배포 후 Cloudflare 대시보드에서 커스텀 도메인 yoyang.keywordegg.com 을 연결한다.
+}

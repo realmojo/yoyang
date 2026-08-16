@@ -1,0 +1,42 @@
+{
+  "name": "yoyang",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "probe:eval": "node scripts/import-evaluations.mjs --probe",
+    "import:eval": "node scripts/import-evaluations.mjs",
+    "import:eval:csv": "node scripts/import-evaluations.mjs --csv",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf:upload": "opennextjs-cloudflare build && wrangler versions upload",
+    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+  },
+  "dependencies": {
+    "@opennextjs/cloudflare": "^1.20.2",
+    "@supabase/supabase-js": "^2.87.0",
+    "next": "^16.2.12",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "sanitize-html": "^2.17.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/sanitize-html": "^2.16.1",
+    "csv-parse": "^5.6.0",
+    "dotenv": "^16.4.7",
+    "eslint": "^9",
+    "eslint-config-next": "^16.2.12",
+    "iconv-lite": "^0.6.3",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "wrangler": "^4.115.0"
+  }
+}
