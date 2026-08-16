@@ -19,6 +19,8 @@ import { htmlToPlainText } from "@/lib/post-html";
 import RegionHubView from "./RegionHubView";
 import RegionView from "./RegionView";
 import CategoryView from "./CategoryView";
+import GradeView from "./GradeView";
+import CostView from "./CostView";
 import ArticleView from "./ArticleView";
 
 /**
@@ -43,6 +45,42 @@ interface Props {
   searchParams: Promise<{ page?: string }>;
 }
 
+/**
+ * 따로 짠 카테고리 화면의 메타데이터.
+ *
+ * /등급 과 /비용 은 글 목록이 아니라 독립된 문서라서, 카테고리 설명을 그대로
+ * 쓰면 화면 내용과 어긋난다.
+ */
+const CATEGORY_META: Record<
+  string,
+  { title: string; description: string; keywords: string[] }
+> = {
+  등급: {
+    title: `장기요양기관 평가등급 A~E 읽는 법 | ${SITE.name}`,
+    description:
+      "공단이 매기는 평가등급 A~E가 무엇을 재는지, 전국 등급 분포는 어떤지, A등급 비율이 높은 지역은 어디인지 공개 데이터로 정리했습니다.",
+    keywords: [
+      "장기요양기관 평가등급",
+      "요양원 등급",
+      "A등급 요양원",
+      "평가등급 기준",
+      "요양시설 평가",
+    ],
+  },
+  비용: {
+    title: `요양 비용은 어떻게 정해지나 — 급여와 비급여 | ${SITE.name}`,
+    description:
+      "요양원 비용이 기관마다 다른 이유를 급여와 비급여로 나눠 설명합니다. 상담 전에 물어볼 네 가지와 부담을 줄이는 제도까지 정리했습니다.",
+    keywords: [
+      "요양원 비용",
+      "장기요양 본인부담금",
+      "비급여",
+      "식사재료비",
+      "상급침실 이용료",
+    ],
+  },
+};
+
 /* ------------------------------ 메타데이터 ------------------------------ */
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -63,11 +101,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const category = findCategory(slug);
   if (category) {
+    const custom = CATEGORY_META[category.slug];
     return buildMetadata({
       path: `/${category.slug}`,
-      title: `${category.name} | ${SITE.name}`,
-      description: category.description,
-      keywords: [category.name, "장기요양", SITE.name],
+      title: custom?.title ?? `${category.name} | ${SITE.name}`,
+      description: custom?.description ?? category.description,
+      keywords: custom?.keywords ?? [category.name, "장기요양", SITE.name],
     });
   }
 
@@ -133,6 +172,11 @@ export default async function SlugPage({ params, searchParams }: Props) {
 
   const category = findCategory(slug);
   if (category) {
+    // 등급·비용은 글 목록이 아니라 주제에 맞춰 따로 짠 화면을 쓴다.
+    // 나머지 카테고리는 기본 목록 화면 그대로다.
+    if (category.slug === "등급") return <GradeView category={category} />;
+    if (category.slug === "비용") return <CostView category={category} />;
+
     const { page } = await searchParams;
     return (
       <CategoryView
