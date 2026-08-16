@@ -1424,6 +1424,48 @@ a.cta-btn {
   color: #a4a9a0;
 }
 
+/* ---- 버튼 두 개를 나란히 (기관 상세 상단) ---- */
+.cta-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 26px 0;
+}
+
+.cta-row .cta-btn {
+  min-height: 60px;
+  padding: 16px 18px;
+  font-size: 17px;
+}
+
+/* 보조 버튼. 밝은 본문판 위에 얹히므로 테두리만 쓴다. */
+.entry-content a.cta-btn--ghost,
+.cta-btn--ghost {
+  background: transparent;
+  color: var(--c-primary-dark);
+  border: 1.5px solid var(--c-accent);
+  box-shadow: none;
+}
+
+.cta-btn--ghost:hover {
+  background: var(--c-primary-light);
+}
+
+.cta-row__note {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 13px;
+  color: var(--c-text-sub);
+  text-align: center;
+  line-height: 1.6;
+}
+
+@media (max-width: 560px) {
+  .cta-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---- 이동 경로 (기관 상세 상단) ----
    밝은 본문판 위에 얹히므로 어두운 글자를 쓴다. */
 .crumbs {

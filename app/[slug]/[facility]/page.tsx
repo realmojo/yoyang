@@ -108,7 +108,7 @@ export default async function FacilityPage({ params }: Props) {
   const { latest } = detail;
   const comparison = compareAreas(detail, stats, region.name);
   const summary = summarySentence(detail, region.name, national);
-  const faq = buildFaq(detail, region.name, stats, national);
+  const faq = buildFaq(detail, region.name, stats);
 
   const regionAvg = round1(stats?.avg_total_score ?? null);
   const nationalAvg = round1(national?.avg_total_score ?? null);
@@ -206,6 +206,39 @@ export default async function FacilityPage({ params }: Props) {
             </div>
 
             <p className="entry-lead">{summary}</p>
+
+            {/* 이 페이지에 온 사람이 곧바로 하고 싶어 하는 두 가지.
+                하나는 위치·연락처 확인(우리에게 없는 정보라 밖으로 보낸다),
+                다른 하나는 근처 다른 기관과 견주기(사이트 안에서 해결된다). */}
+            <div className="cta-row">
+              <a
+                className="cta-btn"
+                href={`https://search.naver.com/search.naver?query=${encodeURIComponent(`${region.name} ${detail.name}`)}`}
+                target="_self"
+                rel="nofollow noopener noreferrer"
+              >
+                📍 위치·연락처 찾아보기
+              </a>
+              <a
+                className="cta-btn cta-btn--ghost"
+                href={`/${region.slug}`}
+                target="_self"
+              >
+                🏥 {region.name} 기관{" "}
+                {stats ? `${stats.facility_count}곳` : ""} 비교
+              </a>
+              <p className="cta-row__note">
+                평가 결과 데이터에는 주소·전화번호가 없습니다. 연락처는 검색이나{" "}
+                <a
+                  href={OFFICIAL_LINKS.longtermcare}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  공단 기관 찾기
+                </a>
+                에서 확인하세요.
+              </p>
+            </div>
 
             <div className="ad-slot">
               <Adsense slotId={AD_SLOTS.middle} />

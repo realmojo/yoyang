@@ -348,21 +348,25 @@ export function summarySentence(
 }
 
 /**
- * 기관별 자주 묻는 질문.
+ * 기관별 자주 묻는 질문 3개.
  *
  * 값을 기관 데이터에서 채우므로 페이지마다 답이 다르다. FAQPage 구조화
  * 데이터로도 내보내는데, 모든 기관이 같은 답을 쓰면 그건 구조화 데이터가
  * 아니라 중복 문서라서 의미가 없다.
+ *
+ * 셋만 고른 기준은 "본문 h2 로 이미 답한 것은 빼고, 사람들이 실제로 묻는 것만"
+ * 이다. 급여종류와 지역 순위는 본문에 표와 목록으로 들어가 있어 뺐다.
+ *   1) 몇 등급인가        — 이 페이지에 오는 첫 번째 이유
+ *   2) 언제 기준인가      — 3년 주기라 가장 자주 오해하는 지점
+ *   3) 연락처는 어디서    — 우리가 답할 수 없는 것. 공단으로 넘긴다
  */
 export function buildFaq(
   detail: FacilityDetail,
   regionName: string,
   stats: RegionStats | null,
-  national: NationalStats | null,
 ): Array<{ q: string; a: string }> {
   const { latest, name } = detail;
   const regionAvg = round1(stats?.avg_total_score ?? null);
-  const natAvg = round1(national?.avg_total_score ?? null);
   const faq: Array<{ q: string; a: string }> = [];
 
   // 1) 등급
@@ -387,32 +391,17 @@ export function buildFaq(
     });
   }
 
-  // 2) 급여종류
-  faq.push({
-    q: `${name}${withParticle(name, "은는").slice(name.length)} 어떤 서비스를 제공하나요?`,
-    a: `공단 평가 자료 기준으로 ${detail.serviceLabels.join(", ")}${detail.serviceLabels.length > 1 ? " 급여를 함께 운영합니다." : " 급여를 운영합니다."} 실제 제공 서비스와 이용 조건은 기관에 직접 확인하시기 바랍니다.`,
-  });
-
-  // 3) 평가 시점 — 이 사이트가 가장 강조하는 부분
+  // 2) 평가 시점 — 이 사이트가 가장 강조하는 부분
   faq.push({
     q: "이 평가등급은 언제 기준인가요?",
     a: `${formatEvalMonth(latest.date)} 평가 기준입니다. 장기요양기관 정기평가는 급여종류별로 3년 주기로 진행되어 매년 이뤄지지 않습니다. 평가 이후 운영 상태가 달라졌을 수 있으므로 방문과 상담으로 확인하시기 바랍니다.`,
   });
 
-  // 4) 주소·연락처
+  // 3) 주소·연락처 — 우리가 가지고 있지 않은 정보
   faq.push({
     q: `${name}의 주소와 전화번호는 어디서 확인하나요?`,
     a: "이 페이지가 쓰는 공단 평가 결과 데이터에는 주소와 연락처가 포함되어 있지 않습니다. 확인되지 않은 정보를 적지 않기 위해 비워 두었습니다. 국민건강보험공단 노인장기요양보험의 기관 찾기에서 기관명으로 검색하시면 확인할 수 있습니다.",
   });
-
-  // 5) 순위 (계산 가능할 때만)
-  if (detail.rank !== null && detail.rankTotal > 1 && natAvg !== null) {
-    const percentile = Math.round((detail.rank / detail.rankTotal) * 100);
-    faq.push({
-      q: `${name}${withParticle(name, "은는").slice(name.length)} ${regionName}에서 어느 정도 수준인가요?`,
-      a: `평가총점 기준으로 ${regionName} 내 평가 대상 ${detail.rankTotal}곳 가운데 ${detail.rank}번째로, 상위 ${percentile}% 안에 듭니다. 다만 순위는 총점만 비교한 것이고 급여종류와 평가 시점이 기관마다 달라 그대로 우열로 읽기는 어렵습니다.`,
-    });
-  }
 
   return faq;
 }
