@@ -116,7 +116,7 @@ export default function RootLayout({
           type="text/javascript"
           dangerouslySetInnerHTML={{
             __html:
-              'if(!wcs_add) var wcs_add = {}; wcs_add["wa"] = "1a6fa2f9147ac30"; if(window.wcs) {wcs_do();}',
+              'if(!wcs_add) var wcs_add = {}; wcs_add["wa"] = "159f7184d59b700"; if(window.wcs) {wcs_do();}',
           }}
         />
         <script
