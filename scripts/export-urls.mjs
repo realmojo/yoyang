@@ -52,7 +52,8 @@ async function main() {
   const outFile =
     outArg >= 0 && process.argv[outArg + 1]
       ? path.resolve(process.argv[outArg + 1])
-      : path.join(ROOT, "naver-indexing/urls.txt");
+      // URL 목록은 m/naver-indexing/data/<사이트>/ 한곳에서 관리한다.
+      : path.resolve(ROOT, "../naver-indexing/data/yoyang/urls.txt");
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
